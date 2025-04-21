@@ -1,0 +1,173 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>비교급과 최상급 가이드</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="container mx-auto p-6 max-w-4xl">
+        <h1 class="text-3xl font-bold text-center text-blue-600 mb-6">비교급과 최상급 형용사</h1>
+        
+        <section class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">1. 비교급과 최상급이란?</h2>
+            <p class="text-gray-600 mb-4">
+                비교급은 두 가지를 비교하여 어느 것이 더 크거나 작거나 같은지를 나타냅니다. 
+                최상급은 셋 이상을 비교하여 어떤 것이 가장 뛰어난지를 나타냅니다.
+            </p>
+            <ul class="list-disc pl-6 text-gray-600">
+                <li><strong>비교급</strong>: "이 책은 저 책보다 <em>더 재미있다</em>."</li>
+                <li><strong>최상급</strong>: "이 책은 도서관에서 <em>가장 재미있는</em> 책이다."</li>
+            </ul>
+        </section>
+
+        <section class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">2. 비교급과 최상급 만드는 법</h2>
+            
+            <h3 class="text-xl font-medium text-gray-700 mb-2">일반 형용사</h3>
+            <table class="w-full text-left border-collapse mb-4">
+                <thead>
+                    <tr class="bg-blue-100">
+                        <th class="p-2 border">형용사</th>
+                        <th class="p-2 border">비교급</th>
+                        <th class="p-2 border">최상급</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="p-2 border">키가 큰 (tall)</td>
+                        <td class="p-2 border">더 키가 큰 (taller)</td>
+                        <td class="p-2 border">가장 키가 큰 (tallest)</td>
+                    </tr>
+                    <tr>
+                        <td class="p-2 border">큰 (big)</td>
+                        <td class="p-2 border">더 큰 (bigger)</td>
+                        <td class="p-2 border">가장 큰 (biggest)</td>
+                    </tr>
+                    <tr>
+                        <td class="p-2 border">재미있는 (interesting)</td>
+                        <td class="p-2 border">더 재미있는 (more interesting)</td>
+                        <td class="p-2 border">가장 재미있는 (most interesting)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3 class="text-xl font-medium text-gray-700 mb-2">규칙</h3>
+            <ul class="list-disc pl-6 text-gray-600 mb-4">
+                <li><strong>한 음절 형용사</strong>: <em>-er</em>(비교급) 또는 <em>-est</em>(최상급)를 붙임. 
+                    <br>예: 키가 큰 (tall) → 더 키가 큰 (taller) → 가장 키가 큰 (tallest)</li>
+                <li><strong>자음-모음-자음으로 끝나는 한 음절 형용사</strong>: 마지막 자음을 두 번 쓰고 <em>-er</em> 또는 <em>-est</em>를 붙임. 
+                    <br>예: 큰 (big) → 더 큰 (bigger) → 가장 큰 (biggest)</li>
+                <li><strong>두 음절 이상 형용사</strong>: <em>more</em>(비교급) 또는 <em>most</em>(최상급)를 사용. 
+                    <br>예: 재미있는 (interesting) → 더 재미있는 (more interesting) → 가장 재미있는 (most interesting)</li>
+                <li><strong>-y로 끝나는 형용사</strong>: <em>-y</em>를 <em>-i</em>로 바꾸고 <em>-er</em> 또는 <em>-est</em>를 붙임. 
+                    <br>예: 행복한 (happy) → 더 행복한 (happier) → 가장 행복한 (happiest)</li>
+            </ul>
+        </section>
+
+        <section class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">3. 불규칙 형용사</h2>
+            <table class="w-full text-left border-collapse mb-4">
+                <thead>
+                    <tr class="bg-blue-100">
+                        <th class="p-2 border">형용사</th>
+                        <th class="p-2 border">비교급</th>
+                        <th class="p-2 border">최상급</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="p-2 border">좋은 (good)</td>
+                        <td class="p-2 border">더 좋은 (better)</td>
+                        <td class="p-2 border">가장 좋은 (best)</td>
+                    </tr>
+                    <tr>
+                        <td class="p-2 border">나쁜 (bad)</td>
+                        <td class="p-2 border">더 나쁜 (worse)</td>
+                        <td class="p-2 border">가장 나쁜 (worst)</td>
+                    </tr>
+                    <tr>
+                        <td class="p-2 border">먼 (far)</td>
+                        <td class="p-2 border">더 먼 (farther/further)</td>
+                        <td class="p-2 border">가장 먼 (farthest/furthest)</td>
+                    </tr>
+                    <tr>
+                        <td class="p-2 border">적은 (little)</td>
+                        <td class="p-2 border">더 적은 (less)</td>
+                        <td class="p-2 border">가장 적은 (least)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">4. 사용 시 주의점</h2>
+            <ul class="list-disc pl-6 text-gray-600">
+                <li><strong>비교급</strong>: 두 가지를 비교할 때 <em>than</em>을 사용. 
+                    <br>예: "그녀는 오빠보다 <em>키가 더 크다</em>."</li>
+                <li><strong>최상급</strong>: 최상급 앞에 <em>the</em>를 붙임. 
+                    <br>예: "그는 학급에서 <em>가장 키가 크다</em>."</li>
+                <li><strong>Less와 Least</strong>: 부정적인 비교에 사용. 
+                    <br>예: "이건 저것보다 <em>덜 비싸다</em>." / "이건 <em>가장 덜 비싼</em> 거다."</li>
+                <li><strong>동일 비교</strong>: <em>as + 형용사 + as</em>를 사용. 
+                    <br>예: "이 가방은 저 가방만큼 <em>무겁다</em>."</li>
+            </ul>
+        </section>
+
+        <section class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">5. 예문</h2>
+            <ul class="list-disc pl-6 text-gray-600">
+                <li>비교급: "이 영화는 지난번 영화보다 <em>더 재미있다</em>."</li>
+                <li>최상급: "이건 내가 본 영화 중 <em>가장 재미있는</em> 영화다."</li>
+                <li>불규칙: "그녀의 점수는 내 점수보다 <em>더 좋았지만</em>, 그의 점수가 <em>가장 좋았다</em>."</li>
+                <li>동일: "내 폰은 너 폰만큼 <em>빠르다</em>."</li>
+                <li>부정: "이 과제는 생각했던 것보다 <em>덜 어렵다</em>."</li>
+            </ul>
+        </section>
+
+        <footer class="text-center text-gray-500 mt-6">
+            <p>교육용으로 제작됨 | © 2025</p>
+        </footer>
+    </div>
+</body>
+</html>
